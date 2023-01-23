@@ -16,7 +16,14 @@ from homeassistant.components.switch import SwitchEntityDescription
 from homeassistant.components.button import ButtonEntityDescription
 from homeassistant.helpers.entity import EntityCategory, EntityDescription
 from homeassistant.components.binary_sensor import BinarySensorEntityDescription
-
+from homeassistant.const import (
+    UnitOfElectricCurrent,
+    UnitOfPower,
+    UnitOfApparentPower,
+    UnitOfEnergy,
+    UnitOfTemperature,
+    UnitOfElectricPotential,
+)
 from .duosida_api import DuosidaAPI, ConnectionException
 from .const import NAME, COORDINATOR
 
@@ -414,12 +421,14 @@ DUOSIDA_SENSOR_TYPES: tuple[DuosidaSensorEntityDescription, ...] = (
         name=f"{NAME} station temp",
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         get_native_value=DuosidaDevice.get_device_temperature,
     ),
     DuosidaSensorEntityDescription(
         key=DeviceAttribute.STATUS,
         name=f"{NAME} status",
         device_class=SensorDeviceClass.ENUM,
+        icon="mdi:ev-station",
         get_native_value=DuosidaDevice.get_device_status,
     ),
     DuosidaSensorEntityDescription(
@@ -427,6 +436,7 @@ DUOSIDA_SENSOR_TYPES: tuple[DuosidaSensorEntityDescription, ...] = (
         name=f"{NAME} current",
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         get_native_value=DuosidaDevice.get_device_current,
     ),
     DuosidaSensorEntityDescription(
@@ -434,6 +444,7 @@ DUOSIDA_SENSOR_TYPES: tuple[DuosidaSensorEntityDescription, ...] = (
         name=f"{NAME} current2",
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         get_native_value=DuosidaDevice.get_device_current2,
     ),
     DuosidaSensorEntityDescription(
@@ -441,6 +452,7 @@ DUOSIDA_SENSOR_TYPES: tuple[DuosidaSensorEntityDescription, ...] = (
         name=f"{NAME} current3",
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         get_native_value=DuosidaDevice.get_device_current3,
     ),
     DuosidaSensorEntityDescription(
@@ -448,6 +460,7 @@ DUOSIDA_SENSOR_TYPES: tuple[DuosidaSensorEntityDescription, ...] = (
         name=f"{NAME} Voltage",
         device_class=SensorDeviceClass.VOLTAGE,
         state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         get_native_value=DuosidaDevice.get_device_voltage,
     ),
     DuosidaSensorEntityDescription(
@@ -455,6 +468,7 @@ DUOSIDA_SENSOR_TYPES: tuple[DuosidaSensorEntityDescription, ...] = (
         name=f"{NAME} Voltage2",
         device_class=SensorDeviceClass.VOLTAGE,
         state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         get_native_value=DuosidaDevice.get_device_voltage2,
     ),
     DuosidaSensorEntityDescription(
@@ -462,6 +476,7 @@ DUOSIDA_SENSOR_TYPES: tuple[DuosidaSensorEntityDescription, ...] = (
         name=f"{NAME} Voltage3",
         device_class=SensorDeviceClass.VOLTAGE,
         state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         get_native_value=DuosidaDevice.get_device_voltage3,
     ),
     DuosidaSensorEntityDescription(
@@ -469,6 +484,7 @@ DUOSIDA_SENSOR_TYPES: tuple[DuosidaSensorEntityDescription, ...] = (
         name=f"{NAME} accEnergy",
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfPower.KILO_WATT,
         get_native_value=DuosidaDevice.get_device_accenergy,
     ),
     DuosidaSensorEntityDescription(
@@ -476,6 +492,7 @@ DUOSIDA_SENSOR_TYPES: tuple[DuosidaSensorEntityDescription, ...] = (
         name=f"{NAME} accEnergy2",
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfPower.KILO_WATT,
         get_native_value=DuosidaDevice.get_device_accenergy2,
     ),
     DuosidaSensorEntityDescription(
@@ -483,6 +500,7 @@ DUOSIDA_SENSOR_TYPES: tuple[DuosidaSensorEntityDescription, ...] = (
         name=f"{NAME} maxCurrent",
         device_class=SensorDeviceClass.CURRENT,
         state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         get_native_value=DuosidaDevice.get_device_max_current,
     ),
     DuosidaSensorEntityDescription(
@@ -490,6 +508,7 @@ DUOSIDA_SENSOR_TYPES: tuple[DuosidaSensorEntityDescription, ...] = (
         name=f"{NAME} Power",
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfPower.KILO_WATT,
         get_native_value=DuosidaDevice.get_device_power,
     ),
 )
@@ -517,6 +536,7 @@ DUOSIDA_NUMBER_TYPES: tuple[DuosidaNumberEntityDescription, ...] = (
         name=f"{NAME} set maximal current",
         icon="mdi:transmission-tower",
         entity_category=EntityCategory.CONFIG,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         native_min_value=6,
         native_max_value=32,
         native_step=1,
