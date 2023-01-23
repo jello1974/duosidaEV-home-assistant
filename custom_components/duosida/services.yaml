@@ -1,0 +1,20 @@
+set_device_charging_power:
+  name: Set device charging power
+  description: Duosida device property
+  fields:
+    device_id:
+      name: Device
+      description: Duosida device on which to set item.
+      required: true
+      selector:
+        device:
+          integration: duosida
+    value:
+      name: Value
+      description: Value of the setting.
+      required: true
+      example: "16"
+      selector:
+        number:
+          min: 6
+          max: 32

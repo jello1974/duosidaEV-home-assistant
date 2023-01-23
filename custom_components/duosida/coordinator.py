@@ -1,0 +1,40 @@
+"""Coordinator class for Duosida module."""
+from __future__ import annotations
+from collections.abc import Callable
+from datetime import timedelta
+
+import logging
+
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+
+from .const import DOMAIN
+from .duosida import DuosidaDevice
+
+_LOGGER = logging.getLogger(__name__)
+
+
+class DeviceDataUpdateCoordinator(DataUpdateCoordinator):
+    """Manages polling for state changes from the device."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        device: DuosidaDevice,
+        scan_interval_seconds: int,
+        coordinator_name: str,
+        async_update_state: Callable,
+    ) -> None:
+        """Initialize the data update coordinator."""
+        super().__init__(
+            hass,
+            _LOGGER,
+            name=f"{DOMAIN}-{device.get_device_name}-{coordinator_name}",
+            update_interval=timedelta(seconds=scan_interval_seconds),
+        )
+
+        self.device = device
+        self.async_update_state = async_update_state
+
+    async def _async_update_data(self):
+        await self.async_update_state()
