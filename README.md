@@ -2,7 +2,7 @@
 
 
 ## Integration was tested on and works with:
-- Duosida D EV charger (DS CHARGE APP)
+- Duosida D EV charger single phase 7.2 kW (DS CHARGE APP)
 
 Feel free to test something else and create new issue / pull request if something goes wrong.
 
