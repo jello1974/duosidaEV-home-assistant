@@ -25,7 +25,7 @@ async def async_setup_entry(
         coordinator: DeviceDataUpdateCoordinator = hass.data[DOMAIN][entry.unique_id][
             description.coordinator
         ]
-        duosida_numbers.append(DuosidaNumber(coordinator, description, None))
+        duosida_numbers.append(DuosidaNumber(coordinator, description))
 
     async_add_entities(duosida_numbers)
 
@@ -37,9 +37,8 @@ class DuosidaNumber(DuosidaEntity, NumberEntity):
         self,
         coordinator: DeviceDataUpdateCoordinator,
         description: DuosidaNumberEntityDescription,
-        zone: int,
     ) -> None:
-        super().__init__(coordinator, description, zone)
+        super().__init__(coordinator, description)
 
     @property
     def name(self):

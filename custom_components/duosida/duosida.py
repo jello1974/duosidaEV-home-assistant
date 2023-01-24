@@ -19,8 +19,6 @@ from homeassistant.components.binary_sensor import BinarySensorEntityDescription
 from homeassistant.const import (
     UnitOfElectricCurrent,
     UnitOfPower,
-    UnitOfApparentPower,
-    UnitOfEnergy,
     UnitOfTemperature,
     UnitOfElectricPotential,
 )
@@ -62,7 +60,7 @@ class DuosidaDevice(ABC):
     def set_device_max_current(self, val: int):
         """Set device max operating power"""
         self.detail_attributes[DeviceDetail.MAX_CURRENT] = val
-        return self.api.async_set_property(self.id, "VendorMaxWorkCurrent", val)
+        return self.api.async_set_property(self.id, "VendorMaxWorkCurrent", int(val))
 
     def start_charging(self):
         """Device start charging"""
@@ -85,6 +83,15 @@ class DuosidaDevice(ABC):
                 DeviceConfig.START_STOP_CHARGING = True
                 return True
         return None
+
+    def get_device_brightness(self) -> Optional[str]:
+        """Get device display brightness"""
+        return self.config_attributes.get(DeviceConfig.LED_STRENGHT, None)
+
+    def set_device_brightness(self, val: str):
+        """Set device display brightness"""
+        self.detail_attributes[DeviceConfig.LED_STRENGHT] = val
+        return self.api.async_set_property(self.id, "VendorLEDStrength", int(val))
 
     def get_device_name(self) -> Optional[str]:
         """Get device name"""
@@ -542,6 +549,17 @@ DUOSIDA_NUMBER_TYPES: tuple[DuosidaNumberEntityDescription, ...] = (
         native_step=1,
         getter=DuosidaDevice.get_device_max_current,
         setter=DuosidaDevice.set_device_max_current,
+    ),
+    DuosidaNumberEntityDescription(
+        key=DeviceConfig.MAX_CURRENT,
+        name=f"{NAME} set display brightness",
+        icon="mdi:lightbulb",
+        entity_category=EntityCategory.CONFIG,
+        native_min_value=0,
+        native_max_value=3,
+        native_step=1,
+        getter=DuosidaDevice.get_device_brightness,
+        setter=DuosidaDevice.set_device_brightness,
     ),
 )
 
