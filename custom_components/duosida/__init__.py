@@ -73,6 +73,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     else:
         device.config_attributes = await duosida.api.async_get_device_config(deviceid)
         device.detail_attributes = await duosida.api.async_get_device_detail(deviceid)
+        if device.detail_attributes["txStop"] != "null":
+            device.config_attributes["last_reset"] = device.detail_attributes["txStop"]
 
     scan_interval_seconds = entry.options.get(
         CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL_SECONDS

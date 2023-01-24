@@ -1,6 +1,7 @@
 """Duosida module"""
 import asyncio
 import logging
+import datetime
 from abc import ABC
 from typing import Any, Optional, Final
 from enum import IntFlag, unique
@@ -21,6 +22,7 @@ from homeassistant.const import (
     UnitOfPower,
     UnitOfTemperature,
     UnitOfElectricPotential,
+    UnitOfEnergy,
 )
 from .duosida_api import DuosidaAPI, ConnectionException
 from .const import NAME, COORDINATOR
@@ -68,6 +70,7 @@ class DuosidaDevice(ABC):
 
     def stop_charging(self):
         """Device stop charging"""
+        self.config_attributes[DeviceConfig.DIRECT_WORK_MODE] = datetime.datetime.now()
         return self.api.async_device_stop_charge(self.id)
 
     def get_button_status(self) -> bool:
@@ -87,6 +90,10 @@ class DuosidaDevice(ABC):
     def get_device_brightness(self) -> Optional[str]:
         """Get device display brightness"""
         return self.config_attributes.get(DeviceConfig.LED_STRENGHT, None)
+
+    def get_acc_last_reset(self):
+        """Get device last charging time"""
+        return self.config_attributes.get(DeviceConfig.LAST_RESET, None)
 
     def set_device_brightness(self, val: str):
         """Set device display brightness"""
@@ -113,7 +120,7 @@ class DuosidaDevice(ABC):
         """Get device firmware version"""
         return self.attributes.get(DeviceAttribute.FW, None)
 
-    def get_device_temperature(self) -> Optional[str]:
+    def get_device_temperature(self) -> Optional[float]:
         """Get device temperature"""
         return self.detail_attributes.get(DeviceDetail.TEMPERATURE, None)
 
@@ -121,39 +128,39 @@ class DuosidaDevice(ABC):
         """Get device connection status"""
         return Status(self.detail_attributes.get(DeviceDetail.CONNECTION_STATUS, None))
 
-    def get_device_current(self) -> Optional[str]:
+    def get_device_current(self) -> Optional[float]:
         """Get device current"""
         return self.detail_attributes.get(DeviceDetail.CURRENT, None)
 
-    def get_device_current2(self) -> Optional[str]:
+    def get_device_current2(self) -> Optional[float]:
         """Get device current phase 2"""
         return self.detail_attributes.get(DeviceDetail.CURRENT2, None)
 
-    def get_device_current3(self) -> Optional[str]:
+    def get_device_current3(self) -> Optional[float]:
         """Get device current phase 3"""
         return self.detail_attributes.get(DeviceDetail.CURRENT3, None)
 
-    def get_device_voltage(self) -> Optional[str]:
+    def get_device_voltage(self) -> Optional[int]:
         """Get device voltage"""
         return self.detail_attributes.get(DeviceDetail.VOLTAGE, None)
 
-    def get_device_voltage2(self) -> Optional[str]:
+    def get_device_voltage2(self) -> Optional[int]:
         """Get device voltage phase 2"""
         return self.detail_attributes.get(DeviceDetail.VOLTAGE2, None)
 
-    def get_device_voltage3(self) -> Optional[str]:
+    def get_device_voltage3(self) -> Optional[int]:
         """Get device voltage phase 3"""
         return self.detail_attributes.get(DeviceDetail.VOLTAGE3, None)
 
-    def get_device_accenergy(self) -> Optional[str]:
+    def get_device_accenergy(self) -> Optional[float]:
         """Get device accenergy"""
         return self.detail_attributes.get(DeviceDetail.ACCENERGY, None)
 
-    def get_device_accenergy2(self) -> Optional[str]:
+    def get_device_accenergy2(self) -> Optional[float]:
         """Get device accenergy2"""
         return self.detail_attributes.get(DeviceDetail.ACCENERGY2, None)
 
-    def get_device_max_current(self) -> Optional[str]:
+    def get_device_max_current(self) -> Optional[int]:
         """Get device firmware version"""
         return self.detail_attributes.get(DeviceDetail.MAX_CURRENT, None)
 
@@ -257,6 +264,7 @@ class DeviceConfig(DuosidaDevice):
     MAX_CURRENT: Final[int] = "maxCurrent"
     STOP_ON_DISCONNECT: Final[bool] = "stopTranOnEVSideDiscon"
     START_STOP_CHARGING: Final[bool] = "StartStopCharging"
+    LAST_RESET: Final[int] = "last_reset"
 
 
 class DeviceDetail(DuosidaDevice):
@@ -489,18 +497,22 @@ DUOSIDA_SENSOR_TYPES: tuple[DuosidaSensorEntityDescription, ...] = (
     DuosidaSensorEntityDescription(
         key=DeviceDetail.ACCENERGY,
         name=f"{NAME} accEnergy",
-        device_class=SensorDeviceClass.POWER,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=UnitOfPower.KILO_WATT,
+        # entity_category=EntityCategory.DIAGNOSTIC,
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         get_native_value=DuosidaDevice.get_device_accenergy,
+        last_reset=DuosidaDevice.get_acc_last_reset,
     ),
     DuosidaSensorEntityDescription(
         key=DeviceDetail.ACCENERGY2,
         name=f"{NAME} accEnergy2",
-        device_class=SensorDeviceClass.POWER,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=UnitOfPower.KILO_WATT,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL,
         get_native_value=DuosidaDevice.get_device_accenergy2,
+        last_reset=DuosidaDevice.get_acc_last_reset,
     ),
     DuosidaSensorEntityDescription(
         key=DeviceDetail.MAX_CURRENT,
