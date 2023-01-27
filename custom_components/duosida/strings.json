@@ -21,7 +21,7 @@
   "options": {
     "step": {
       "init": {
-        "title": "Configure Duosida D EV Charger",
+        "title": "Configure Duosida D EV Charger scan interval",
         "data": {
           "scan_interval": "Scan Interval (seconds)"
         }

@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 
 import voluptuous as vol
-
+import datetime as dt
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     ATTR_DEVICE_ID,
@@ -74,7 +74,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         device.config_attributes = await duosida.api.async_get_device_config(deviceid)
         device.detail_attributes = await duosida.api.async_get_device_detail(deviceid)
         if device.detail_attributes["txStop"] != "null":
-            device.config_attributes["last_reset"] = device.detail_attributes["txStop"]
+            device.consumption_sequence_last_changed_utc = dt.datetime.now(
+                dt.timezone.utc
+            ) - dt.timedelta(hours=1)
 
     scan_interval_seconds = entry.options.get(
         CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL_SECONDS

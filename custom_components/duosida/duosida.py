@@ -24,6 +24,7 @@ from homeassistant.const import (
     UnitOfElectricPotential,
     UnitOfEnergy,
 )
+import datetime as dt
 from .duosida_api import DuosidaAPI, ConnectionException
 from .const import NAME, COORDINATOR
 
@@ -46,8 +47,15 @@ class DuosidaDevice(ABC):
         self.config_attributes: dict[str, Any] = dict()
         self.data: dict[str, Any] = dict()
         self.id: str = self.attributes.get(DeviceAttribute.ID, "")
+        self.consumption_sequence_last_changed_utc: dt.datetime = (
+            dt.datetime.utcfromtimestamp(0).replace(tzinfo=dt.timezone.utc)
+        )
 
     # @property
+
+    def get_consumption_sequence_last_changed_utc(self) -> dt.datetime:
+        """Get consumption sequence last changed in utc"""
+        return self.consumption_sequence_last_changed_utc
 
     def set_level_detection(self, val: int):
         """Set device level detection"""
@@ -90,10 +98,6 @@ class DuosidaDevice(ABC):
     def get_device_brightness(self) -> Optional[str]:
         """Get device display brightness"""
         return self.config_attributes.get(DeviceConfig.LED_STRENGHT, None)
-
-    def get_acc_last_reset(self):
-        """Get device last charging time"""
-        return self.config_attributes.get(DeviceConfig.LAST_RESET, None)
 
     def set_device_brightness(self, val: str):
         """Set device display brightness"""
@@ -502,17 +506,17 @@ DUOSIDA_SENSOR_TYPES: tuple[DuosidaSensorEntityDescription, ...] = (
         state_class=SensorStateClass.TOTAL,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         get_native_value=DuosidaDevice.get_device_accenergy,
-        last_reset=DuosidaDevice.get_acc_last_reset,
+        get_last_reset=DuosidaDevice.get_consumption_sequence_last_changed_utc,
     ),
     DuosidaSensorEntityDescription(
         key=DeviceDetail.ACCENERGY2,
         name=f"{NAME} accEnergy2",
-        entity_category=EntityCategory.DIAGNOSTIC,
+        # entity_category=EntityCategory.DIAGNOSTIC,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL,
         get_native_value=DuosidaDevice.get_device_accenergy2,
-        last_reset=DuosidaDevice.get_acc_last_reset,
+        get_last_reset=DuosidaDevice.get_consumption_sequence_last_changed_utc,
     ),
     DuosidaSensorEntityDescription(
         key=DeviceDetail.MAX_CURRENT,
