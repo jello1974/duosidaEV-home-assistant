@@ -45,6 +45,7 @@ class DuosidaDevice(ABC):
         self.attributes = attributes
         self.detail_attributes: dict[str, Any] = dict()
         self.config_attributes: dict[str, Any] = dict()
+        self.charging_record: dict[str, Any] = dict()
         self.data: dict[str, Any] = dict()
         self.id: str = self.attributes.get(DeviceAttribute.ID, "")
         self.consumption_sequence_last_changed_utc: dt.datetime = (
@@ -172,6 +173,14 @@ class DuosidaDevice(ABC):
         """Get device power"""
         return self.detail_attributes.get(DeviceDetail.POWER, None)
 
+    def get_device_today_consumption(self) -> Optional[str]:
+        """Get device today consumption"""
+        return self.charging_record.get(Reports.TODAY_CONSUMPTION, None)
+
+    def get_device_total_consumption(self) -> Optional[str]:
+        """Get device today consumption"""
+        return self.charging_record.get(Reports.TOTAL_CONSUMPTION, None)
+
     def get_direct_work_mode(self) -> Optional[str]:
         """Get device direct work mode status"""
         return self.config_attributes.get(DeviceConfig.DIRECT_WORK_MODE, None)
@@ -189,6 +198,7 @@ class DuosidaDevice(ABC):
         """Async update the device states from the cloud"""
         self.config_attributes = await self.api.async_get_device_config(self.id)
         self.detail_attributes = await self.api.async_get_device_detail(self.id)
+        self.charging_record = await self.api.async_get_charging_record(self.id)
         self.get_button_status()
 
 
@@ -287,6 +297,13 @@ class DeviceDetail(DuosidaDevice):
     VOLTAGE: Final[float] = "voltage"
     VOLTAGE2: Final[float] = "voltage2"
     VOLTAGE3: Final[float] = "voltage3"
+
+
+class Reports(DuosidaDevice):
+    """Consumtion reports for device"""
+
+    TODAY_CONSUMPTION: Final[float] = "todayConsumption"
+    TOTAL_CONSUMPTION: Final[float] = "totalConsumption"
 
 
 async def _get_device(
@@ -531,8 +548,28 @@ DUOSIDA_SENSOR_TYPES: tuple[DuosidaSensorEntityDescription, ...] = (
         name=f"{NAME} Power",
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=UnitOfPower.KILO_WATT,
+        native_unit_of_measurement=UnitOfPower.WATT,
         get_native_value=DuosidaDevice.get_device_power,
+    ),
+    DuosidaSensorEntityDescription(
+        key=Reports.TODAY_CONSUMPTION,
+        name=f"{NAME} todayConsumption",
+        # entity_category=EntityCategory.DIAGNOSTIC,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL,
+        get_native_value=DuosidaDevice.get_device_today_consumption,
+        # get_last_reset="1970-01-01T00:00:00+00:00",
+    ),
+    DuosidaSensorEntityDescription(
+        key=Reports.TOTAL_CONSUMPTION,
+        name=f"{NAME} totalConsumption",
+        # entity_category=EntityCategory.DIAGNOSTIC,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL,
+        get_native_value=DuosidaDevice.get_device_total_consumption,
+        # get_last_reset="1970-01-01T00:00:00+00:00",
     ),
 )
 

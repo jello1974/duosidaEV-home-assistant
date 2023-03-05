@@ -6,7 +6,7 @@ import logging
 # import requests
 import aiohttp
 import json
-
+import datetime
 from typing import Final, Any, Optional
 
 DUOSIDA_API_URL: Final[str] = "https://cpam3.x-cheng.com/cpAm2/"
@@ -94,6 +94,30 @@ class DuosidaAPI:
             return features
         return dict()
 
+    async def async_get_charging_record(self, gw_id: str) -> dict[str, Any]:
+        """Async get device charging record"""
+        features = await self._async_get(
+            f"{DUOSIDA_API_URL}{DUOSIDA_CHARGERECORD}{gw_id}"
+        )
+        if features is not None:
+            _json = json.dumps(features)
+            _jsonx = json.loads(_json)
+            json_x = _jsonx["chartList"]
+            today_consumption: float = 0
+            total_consumption: float = 0
+            for row in json_x:
+                charge_date = datetime.date.fromtimestamp(row["timestampStop"] / 1000)
+                current_date = datetime.date.today()
+                if charge_date == current_date:
+                    today_consumption += row["energy"]
+                total_consumption += row["energy"]
+            my_dictionary = {
+                "todayConsumption": today_consumption,
+                "totalConsumption": total_consumption,
+            }
+            return my_dictionary
+        return dict()
+
     async def async_get_features_for_device(
         self, gw_id: str
     ) -> Optional[dict[str, Any]]:
@@ -134,15 +158,6 @@ class DuosidaAPI:
         if features is not None:
             return True
         return False
-
-    async def async_get_charging_record(self, gw_id: str) -> dict[str, Any]:
-        """Async get device charging record"""
-        features = await self._async_post(
-            f"{DUOSIDA_API_URL}{DUOSIDA_CHARGERECORD}{gw_id}?showType=0", None
-        )
-        if features is not None:
-            return features
-        return dict()
 
     async def __async_request(
         self,
