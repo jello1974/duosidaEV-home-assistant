@@ -12,6 +12,7 @@ Use the add integration UI to set up your device.
 
 Integration contains sensors, input number to set max charging power, a button to stop or start charging and a service to use in automations to change max charging power
 
+duosida1.png
 
 
 
