@@ -100,21 +100,29 @@ class DuosidaAPI:
             f"{DUOSIDA_API_URL}{DUOSIDA_CHARGERECORD}{gw_id}"
         )
         if features is not None:
-            _json = json.dumps(features)
-            _jsonx = json.loads(_json)
-            json_x = _jsonx["chartList"]
             today_consumption: float = 0
             total_consumption: float = 0
-            for row in json_x:
-                charge_date = datetime.date.fromtimestamp(row["timestampStop"] / 1000)
-                current_date = datetime.date.today()
-                if charge_date == current_date:
-                    today_consumption += row["energy"]
-                total_consumption += row["energy"]
-            my_dictionary = {
-                "todayConsumption": today_consumption,
-                "totalConsumption": total_consumption,
-            }
+            _json = json.dumps(features)
+            _jsonx = json.loads(_json)
+            if "chartList" in _jsonx:
+                json_x = _jsonx["chartList"]
+                for row in json_x:
+                    charge_date = datetime.date.fromtimestamp(
+                        row["timestampStop"] / 1000
+                    )
+                    current_date = datetime.date.today()
+                    if charge_date == current_date:
+                        today_consumption += row["energy"]
+                    total_consumption += row["energy"]
+                my_dictionary = {
+                    "todayConsumption": today_consumption,
+                    "totalConsumption": total_consumption,
+                }
+            else:
+                my_dictionary = {
+                    "todayConsumption": 0,
+                    "totalConsumption": 0,
+                }
             return my_dictionary
         return dict()
 
