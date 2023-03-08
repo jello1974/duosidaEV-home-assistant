@@ -7,6 +7,7 @@ import logging
 import aiohttp
 import json
 import datetime
+from homeassistant import util
 from typing import Final, Any, Optional
 
 DUOSIDA_API_URL: Final[str] = "https://cpam3.x-cheng.com/cpAm2/"
@@ -110,7 +111,7 @@ class DuosidaAPI:
                     charge_date = datetime.date.fromtimestamp(
                         row["timestampStop"] / 1000
                     )
-                    current_date = datetime.date.today()
+                    current_date = util.dt.now().date()
                     if charge_date == current_date:
                         today_consumption += row["energy"]
                     total_consumption += row["energy"]
