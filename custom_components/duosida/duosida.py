@@ -71,6 +71,7 @@ class DuosidaDevice(ABC):
     def set_device_max_current(self, val: int):
         """Set device max operating power"""
         self.detail_attributes[DeviceDetail.MAX_CURRENT] = val
+        self.config_attributes[DeviceConfig.MAX_CURRENT] = val
         return self.api.async_set_property(self.id, "VendorMaxWorkCurrent", int(val))
 
     def start_charging(self):
@@ -557,7 +558,7 @@ DUOSIDA_SENSOR_TYPES: tuple[DuosidaSensorEntityDescription, ...] = (
         # entity_category=EntityCategory.DIAGNOSTIC,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         device_class=SensorDeviceClass.ENERGY,
-        state_class=SensorStateClass.TOTAL,
+        state_class=SensorStateClass.TOTAL_INCREASING,
         get_native_value=DuosidaDevice.get_device_today_consumption,
         # get_last_reset="1970-01-01T00:00:00+00:00",
     ),
