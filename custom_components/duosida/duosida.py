@@ -70,6 +70,10 @@ class DuosidaDevice(ABC):
 
     def set_device_max_current(self, val: int):
         """Set device max operating power"""
+        if val <= 6:
+            val = 6
+        if val >= 32:
+            val = 32
         self.detail_attributes[DeviceDetail.MAX_CURRENT] = val
         self.config_attributes[DeviceConfig.MAX_CURRENT] = val
         return self.api.async_set_property(self.id, "VendorMaxWorkCurrent", int(val))
