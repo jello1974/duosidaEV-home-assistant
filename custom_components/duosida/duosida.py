@@ -1,10 +1,9 @@
 """Duosida module"""
 import asyncio
 import logging
-import datetime
 from abc import ABC
 from typing import Any, Optional, Final
-from enum import IntFlag, unique
+from enum import unique, Enum
 from collections.abc import Callable
 from dataclasses import dataclass
 from homeassistant.components.number import NumberEntityDescription
@@ -84,14 +83,13 @@ class DuosidaDevice(ABC):
 
     def stop_charging(self):
         """Device stop charging"""
-        self.config_attributes[DeviceConfig.DIRECT_WORK_MODE] = datetime.datetime.now()
+        self.config_attributes[DeviceConfig.DIRECT_WORK_MODE] = dt.datetime.now()
         return self.api.async_device_stop_charge(self.id)
 
     def get_button_status(self) -> bool:
         """Return charging state"""
-        status = Status(
-            self.detail_attributes.get(DeviceDetail.CONNECTION_STATUS, None)
-        )
+        status = self.detail_attributes.get(DeviceDetail.CONNECTION_STATUS, None)
+
         if status is not None:
             if status in [0, 4, 5]:
                 DeviceConfig.START_STOP_CHARGING = False
@@ -241,7 +239,7 @@ class Duosida:
 
 
 @unique
-class Status(IntFlag):
+class Status(Enum):
     """Status mode enum"""
 
     UNDEFINED = -1
@@ -291,7 +289,7 @@ class DeviceDetail(DuosidaDevice):
 
     ACCENERGY: Final[float] = "accEnergy"
     ACCENERGY2: Final[float] = "accEnergy2"
-    CONNECTION_STATUS: Final[IntFlag] = "connStatus"
+    CONNECTION_STATUS: Final[int] = "connStatus"
     CURRENT: Final[float] = "current"
     CURRENT2: Final[float] = "current2"
     CURRENT3: Final[float] = "current3"
