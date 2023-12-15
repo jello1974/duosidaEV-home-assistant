@@ -473,7 +473,7 @@ DUOSIDA_SENSOR_TYPES: tuple[DuosidaSensorEntityDescription, ...] = (
     DuosidaSensorEntityDescription(
         key=DeviceDetail.CURRENT,
         name=f"{NAME} current",
-        device_class=SensorDeviceClass.ENERGY,
+        device_class=SensorDeviceClass.CURRENT,
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         get_native_value=DuosidaDevice.get_device_current,
@@ -481,7 +481,7 @@ DUOSIDA_SENSOR_TYPES: tuple[DuosidaSensorEntityDescription, ...] = (
     DuosidaSensorEntityDescription(
         key=DeviceDetail.CURRENT2,
         name=f"{NAME} current2",
-        device_class=SensorDeviceClass.ENERGY,
+        device_class=SensorDeviceClass.CURRENT,
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         get_native_value=DuosidaDevice.get_device_current2,
@@ -489,7 +489,7 @@ DUOSIDA_SENSOR_TYPES: tuple[DuosidaSensorEntityDescription, ...] = (
     DuosidaSensorEntityDescription(
         key=DeviceDetail.CURRENT3,
         name=f"{NAME} current3",
-        device_class=SensorDeviceClass.ENERGY,
+        device_class=SensorDeviceClass.CURRENT,
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         get_native_value=DuosidaDevice.get_device_current3,
