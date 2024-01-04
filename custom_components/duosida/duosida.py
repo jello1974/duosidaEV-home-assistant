@@ -370,7 +370,7 @@ async def async_hello(
 
 
 @dataclass
-class DuosidaBaseEntityDescription(EntityDescription, ABC):
+class DuosidaBaseEntityDescription(EntityDescription):
     """An abstract class that describes Duosida entites"""
 
     device_detail: list[DeviceDetail] = None
