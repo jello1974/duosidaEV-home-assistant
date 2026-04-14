@@ -97,7 +97,7 @@ class DuosidaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_create_or_update_entry(self, cloud_device):
         """Create or update config entry"""
         existing_entry = await self.async_set_unique_id(
-            cloud_device[DeviceAttribute.ID], raise_on_progress=False
+            str(cloud_device[DeviceAttribute.ID]), raise_on_progress=False
         )
         if existing_entry:
             data = existing_entry.data.copy()
